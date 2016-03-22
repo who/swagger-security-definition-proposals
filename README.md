@@ -3,7 +3,9 @@ This repository holds Swagger spec proposals for extending security definitions.
 
 ### Proposal: customHash
 
-The **customHash** security definition would allow the spec to define `N` fields that need to be passed through `Y` hash algorithm, the output of which is stored in `Z` location.
+The **customHash** security definition would allow the spec to define `n` fields that need to be concatenated and passed through `Y` hash algorithm, the output of which is stored in `Z` location.
+
+#### Example customHash spec
 
 ```
 swagger: '2.0'
@@ -12,11 +14,8 @@ info:
   title: Simple API
 host: example.com
 securityDefinitions: 
-  basicAuth:
-    type: basic
-    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
   customHash: 
-    algorithm: "sha256"
+    algorithm: "HMACSHA256"
     inputs: 
       timestamp: 
         type: "integer"
@@ -31,18 +30,11 @@ securityDefinitions:
         type: "string"
         description: "The shared secret key"
     outputs: 
-      name: "myHash"
+      name: "X-SECURITY-HASH"
       in: "header"
       description: "Holds the hashed value"
 paths:
-  /foo:
-    get:
-      security:
-       - basicAuth: []
-      responses:
-        200:
-          description: OK
-  /bar:
+  /foobar:
     get:
       security:
        - customHash: []
@@ -50,3 +42,7 @@ paths:
         200:
           description: OK
 ```
+
+Using the spec above, in order to HTTP GET example.com/foobar, the caller would have to concatenate a timestamp, the full URI of the request, a secret key and a string of the HTTP body (empty string in this case, as it's an HTTP GET). After concatenation, the resulting string would be passed into the hashing function specified above, HMACSHA256. The resulting value of the hashing step would then be placed into an HTTP header parameter with a key of `X-SECURITY-HASH`.
+
+
