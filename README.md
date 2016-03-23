@@ -1,5 +1,5 @@
 # Swagger securityDefinition proposals
-This repository holds Swagger spec proposals for extending security definitions.
+This repository holds Swagger spec proposals for adding additional security definitions.
 
 ### Proposal: customHash
 
@@ -20,6 +20,7 @@ securityDefinitions:
       timestamp: 
         type: "integer"
         format: "int64"
+        description: "A timestamp, used as a nonce to mitigate replay attacks"
       uri: 
         type: "string"
         description: "The full URI of the request"
@@ -29,7 +30,7 @@ securityDefinitions:
       secret:
         type: "string"
         description: "The shared secret key"
-    outputs: 
+    outputs:
       name: "X-SECURITY-HASH"
       in: "header"
       description: "Holds the hashed value"
@@ -43,6 +44,6 @@ paths:
           description: OK
 ```
 
-Using the spec above, in order to HTTP GET example.com/foobar, the caller would have to concatenate a timestamp, the full URI of the request, a secret key and a string of the HTTP body (empty string in this case, as it's an HTTP GET). After concatenation, the resulting string would be passed into the hashing function specified above, HMACSHA256. The resulting value of the hashing step would then be placed into an HTTP header parameter with a key of `X-SECURITY-HASH`.
+Using the spec above, in order to HTTP GET example.com/foobar, the caller would have to concatenate a timestamp, the full URI of the request, a secret key, and a string of the HTTP body (empty string in this case, as it's an HTTP GET). After concatenation, the resulting string would be passed into the hashing function specified above, HMACSHA256. The resulting value of the hashing step would then be placed into an HTTP header parameter with a key of `X-SECURITY-HASH`.
 
 
